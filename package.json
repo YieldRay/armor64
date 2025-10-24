@@ -1,10 +1,10 @@
 {
-  "name": "nodejs-minimal-ts-template",
-  "private": true,
+  "name": "armor64",
   "version": "0.1.0",
   "type": "module",
-  "description": "",
-  "main": "src/index.ts",
+  "description": "Safe, strict and stable textual encoding of byte streams.",
+  "main": "dist/armor64.js",
+  "types": "dist/armor64.d.ts",
   "files": [
     "src",
     "dist"
@@ -13,16 +13,20 @@
     "cli": "node --experimental-transform-types --disable-warning=ExperimentalWarning src/index.ts",
     "dev": "node --experimental-transform-types --env-file=.env --watch src/index.ts",
     "test": "node --experimental-transform-types --test",
-    "build": "tsc --declaration --sourceMap"
+    "build": "tsc --declaration"
   },
-  "keywords": [],
-  "author": "",
-  "license": "",
+  "keywords": [
+    "encoding",
+    "base64",
+    "armor64"
+  ],
+  "author": "YieldRay",
+  "license": "MIT",
   "engines": {
     "node": ">=22"
   },
   "bin": {
-    "cli-name": "./src/cli.ts"
+    "armor64": "./dist/cli.js"
   },
   "devDependencies": {
     "@types/node": "^22.18.12",

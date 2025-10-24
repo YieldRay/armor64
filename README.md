@@ -1,25 +1,82 @@
-# nodejs-minimal-ts-template
+# armor64
 
-A minimal TypeScript starter for Node.js (Node >= 22 and TypeScript >= 5.8).
+Safe, strict and stable textual encoding of byte streams.
 
-For small apps or microservices you often don't need extra runtime/dev tools like `ts-node`, `tsx`, `nodemon`, `dotenv`, `chalk`, `commander`, `yargs`, `mocha`, or `jest`.
-Modern Node and TypeScript provide enough primitives to keep projects lean.
+- Canonical: one encoding per byte stream; no padding, no variants.
+- Safe: ASCII printable alphabet, URL/JSON-friendly, unique, newline-free.
+- Stable: preserves natural byte order; the spec will not change.
 
-This template uses Node's `--experimental-transform-types` together with TypeScript's `--erasableSyntaxOnly` to run TypeScript code directly with Node.js without any external dependencies.
-
-See also:
-
-- [Do I need this node dependency?](https://brianmuenzenmeyer.com/posts/2024-do-i-need-this-node-dependency/)
-- Node flag [--experimental-transform-types](https://nodejs.org/api/cli.html#--experimental-transform-types)
-- TypeScript flag [--erasableSyntaxOnly](https://devblogs.microsoft.com/typescript/announcing-typescript-5-8/#the---erasablesyntaxonly-option)
-
-Quick start:
+## Install
 
 ```sh
-# create .env file
-touch .env
-# install deps
-npm i
+npm i armor64
 ```
 
-Also see the plain-JS template: [nodejs-pure-js-template](https://github.com/YieldRay/nodejs-pure-js-template).
+## API
+
+```ts
+import { encode, decode, encodeString, decodeToString, isValid } from "armor64";
+
+const a = encode(new Uint8Array([1, 2, 3]));
+const b = decode(a); // Uint8Array
+
+const t = encodeString("Hello, World!");
+const s = decodeToString(t); // "Hello, World!"
+
+isValid(t); // true
+```
+
+## CLI
+
+Installed via npm, the `armor64` CLI can encode/decode and validate.
+
+```
+armor64 encode <text|->      # encode UTF-8 text or bytes from stdin
+armor64 decode <armor|- >    # decode armor64 to raw bytes on stdout
+armor64 validate <armor|- >  # print true/false
+```
+
+Examples:
+
+```sh
+# text to armor
+armor64 encode "JP"            # -> H_-
+
+# armor to bytes (printed raw). To view as UTF-8 text:
+armor64 decode H_- | node -e "process.stdin.on('data',b=>process.stdout.write(b))"
+
+# validate
+armor64 validate H5KgQ5wg74SjRalZ7F  # -> true
+
+# piping bytes through encode (no newline)
+node -e "process.stdout.write(Buffer.from([0,1,2,255]))" | armor64 encode
+```
+
+Notes:
+
+- Use '-' or pipe data to read from stdin.
+- Newlines are forbidden in armor64; ensure your piped text does not add one.
+
+## Specification
+
+Encoding consumes 6-bit blocks from the input (left to right). If fewer than 6 bits remain, they are right-padded with zeros for the final symbol. Alphabet (value -> char):
+
+```
+0..63: -0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz
+```
+
+Decoding maps each character back to 6 bits. Bytes are emitted every 8 bits. If any remaining bits at the end are non-zero, or a character is outside the alphabet, the input is rejected.
+
+## Test vectors
+
+- "" -> ""
+- "JP" -> "H\_-"
+- "Hello, World!" -> "H5KgQ5wg74SjRalZ7F"
+- "armor64 is safe, strict, and stable. It is specified and easy to test. Do not settle for lesser encodings." ->
+  "NM8hQr7qC10dRm0nNLO_A10nS68dNrFg754iO10nS54XQ5Ji73_o75_n76CkOLCdOa\_\_O10WQaFVOL4nTH0oQm0oOMCoAX03Qm0iQrFVRqKoS5l_75OjRX0gOMCnOM7VOLtYQqGdQaSnAV"
+
+Invalid inputs (must fail): space, carriage return, newline, any '=' characters (e.g. "\_\_==").
+
+## License
+
+MIT

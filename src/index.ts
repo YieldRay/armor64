@@ -1,4 +1,4 @@
-export * from "./add.ts";
+export * from "./armor64.ts";
 
 /**
  * Run the CLI when the module is the main module
