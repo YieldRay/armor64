@@ -1,6 +1,11 @@
 # armor64
 
-Safe, strict and stable textual encoding of byte streams.
+[![npm version][npm-version-src]][npm-version-href]
+[![bundle][bundle-src]][bundle-href]
+[![JSDocs][jsdocs-src]][jsdocs-href]
+[![License][license-src]][license-href]
+
+[armor64](https://armor64.org/): Safe, strict and stable textual encoding of byte streams.
 
 - Canonical: one encoding per byte stream; no padding, no variants.
 - Safe: ASCII printable alphabet, URL/JSON-friendly, unique, newline-free.
@@ -80,3 +85,14 @@ Invalid inputs (must fail): space, carriage return, newline, any '=' characters 
 ## License
 
 MIT
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/armor64?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/armor64
+[bundle-src]: https://img.shields.io/bundlephobia/minzip/armor64?style=flat&colorA=080f12&colorB=1fa669&label=minzip
+[bundle-href]: https://bundlephobia.com/result?p=armor64
+[license-src]: https://img.shields.io/github/license/YieldRay/armor64.svg?style=flat&colorA=080f12&colorB=1fa669
+[license-href]: https://github.com/YieldRay/armor64/blob/main/LICENSE
+[jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
+[jsdocs-href]: https://www.jsdocs.io/package/armor64
