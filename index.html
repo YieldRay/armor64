@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>armor64</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        color: #1f2933;
+        background:
+          linear-gradient(
+              rgba(0, 0, 0, 0) 66%,
+              oklab(0.602023 0.0213889 -0.115254 / 0.15) 100%
+            )
+            no-repeat fixed 100% 50% / 100% padding-box border-box,
+          rgb(255, 255, 255)
+            radial-gradient(
+              oklab(0.602023 0.0213889 -0.115254 / 0.15) 1px,
+              rgba(0, 0, 0, 0) 1.5px
+            )
+            space fixed 0px 0px / 18px 18px padding-box border-box;
+      }
+
+      main {
+        width: min(900px, 100%);
+        display: grid;
+        gap: 2rem;
+      }
+
+      header {
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0;
+        font-weight: 600;
+        font-size: clamp(2.2rem, 5vw, 2.8rem);
+        letter-spacing: 0.02em;
+      }
+
+      header p {
+        margin: 0.35rem 0 0;
+        font-size: clamp(1rem, 2.2vw, 1.12rem);
+        color: rgba(31, 41, 51, 0.72);
+      }
+
+      .panels {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        align-items: stretch;
+      }
+
+      fieldset {
+        border-radius: 14px;
+        border: 1px solid rgba(99, 116, 133, 0.2);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 1.5rem;
+        display: grid;
+        gap: 1rem;
+        grid-template-rows: 1fr auto 1fr;
+        backdrop-filter: blur(2px);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.65rem;
+      }
+
+      legend {
+        font-size: 1.05rem;
+        font-weight: 600;
+        padding: 0 0.4rem;
+        color: #243243;
+      }
+
+      textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(99, 116, 133, 0.3);
+        padding: 0.85rem 1rem;
+        min-height: 130px;
+        font-size: 0.95rem;
+        resize: vertical;
+        background-color: rgba(255, 255, 255, 0.85);
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease;
+      }
+
+      .textarea-input,
+      .textarea-output {
+        min-height: 200px;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: rgba(45, 76, 120, 0.45);
+        box-shadow: 0 0 0 3px rgba(45, 76, 120, 0.15);
+      }
+
+      button {
+        justify-self: start;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 1.25rem;
+        min-width: 8rem;
+        border: 1px solid rgba(45, 76, 120, 0.35);
+        border-radius: 16px;
+        background: rgba(45, 76, 120, 0.12);
+        color: #1f2d3d;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition:
+          background-color 120ms ease,
+          border-color 120ms ease,
+          box-shadow 120ms ease;
+      }
+
+      button:hover {
+        background-color: rgba(45, 76, 120, 0.2);
+        border-color: rgba(45, 76, 120, 0.55);
+        box-shadow: 0 4px 12px rgba(45, 76, 120, 0.18);
+      }
+
+      button:active {
+        background-color: rgba(45, 76, 120, 0.3);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        box-shadow: none;
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 1.5rem;
+        }
+
+        button {
+          justify-self: stretch;
+          width: 100%;
+        }
+
+        .actions {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>armor64</h1>
+        <p>Safe, strict and stable textual encoding of byte streams.</p>
+      </header>
+
+      <section class="panels">
+        <fieldset>
+          <legend>Encode</legend>
+          <textarea
+            id="inputEncode"
+            class="textarea-input"
+            rows="4"
+            cols="50"
+            placeholder="Enter text to encode"
+          ></textarea>
+          <div class="actions">
+            <button id="encodeButton">Encode Text</button>
+            <button id="encodeFileButton">Encode File</button>
+            <input type="file" id="fileInputEncode" hidden />
+          </div>
+          <textarea
+            id="outputEncode"
+            class="textarea-output"
+            rows="4"
+            cols="50"
+            placeholder="Encoded output"
+            readonly
+          ></textarea>
+        </fieldset>
+
+        <fieldset>
+          <legend>Decode</legend>
+          <textarea
+            id="inputDecode"
+            class="textarea-input"
+            rows="4"
+            cols="50"
+            placeholder="Enter text to decode"
+          ></textarea>
+          <div class="actions">
+            <button id="decodeButton">Decode</button>
+            <button id="downloadButton" disabled>Download Bytes</button>
+          </div>
+          <textarea
+            id="outputDecode"
+            class="textarea-output"
+            rows="4"
+            cols="50"
+            placeholder="Decoded output"
+            readonly
+          ></textarea>
+        </fieldset>
+      </section>
+    </main>
+  </body>
+
+  <script type="module">
+    import { encodeString, encode, decode } from "./dist/armor64.js";
+
+    const encodeButton = document.getElementById("encodeButton");
+    const encodeFileButton = document.getElementById("encodeFileButton");
+    const decodeButton = document.getElementById("decodeButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const inputEncode = document.getElementById("inputEncode");
+    const outputEncode = document.getElementById("outputEncode");
+    const inputDecode = document.getElementById("inputDecode");
+    const outputDecode = document.getElementById("outputDecode");
+    const fileInputEncode = document.getElementById("fileInputEncode");
+
+    let lastDecodedBytes = null;
+
+    encodeButton.addEventListener("click", () => {
+      const input = inputEncode.value;
+      const output = encodeString(input);
+      outputEncode.value = output;
+    });
+
+    encodeFileButton.addEventListener("click", () => {
+      fileInputEncode.value = "";
+      fileInputEncode.click();
+    });
+
+    fileInputEncode.addEventListener("change", async () => {
+      const [file] = fileInputEncode.files;
+      if (!file) return;
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const encoded = encode(new Uint8Array(buffer));
+        outputEncode.value = encoded;
+        inputEncode.value = "";
+      } catch (error) {
+        alert("Failed to read file for encoding.");
+      }
+    });
+
+    const textareaPairs = [
+      [inputEncode, inputDecode],
+      [outputEncode, outputDecode],
+    ];
+
+    const syncing = new WeakSet();
+
+    textareaPairs.forEach(([a, b]) => {
+      if (!a || !b) return;
+      const applyHeight = (source, target) => {
+        const desired = `${source.offsetHeight}px`;
+        if (target.style.height === desired) return;
+        syncing.add(target);
+        target.style.height = desired;
+        requestAnimationFrame(() => syncing.delete(target));
+      };
+
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const source = entry.target;
+          if (syncing.has(source)) continue;
+          const target = source === a ? b : a;
+          if (!target) continue;
+          applyHeight(source, target);
+        }
+      });
+
+      observer.observe(a);
+      observer.observe(b);
+
+      // Initial alignment
+      requestAnimationFrame(() => {
+        const maxHeight = Math.max(a.offsetHeight, b.offsetHeight);
+        a.style.height = `${maxHeight}px`;
+        b.style.height = `${maxHeight}px`;
+      });
+    });
+
+    decodeButton.addEventListener("click", () => {
+      const input = inputDecode.value;
+      try {
+        const bytes = decode(input);
+        lastDecodedBytes = bytes;
+
+        let textOutput = "";
+        try {
+          textOutput = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+        } catch (stringError) {
+          textOutput = `[Binary data: ${bytes.length} bytes]`;
+        }
+
+        outputDecode.value = textOutput;
+        downloadButton.disabled = bytes.length === 0;
+      } catch (e) {
+        lastDecodedBytes = null;
+        outputDecode.value = "";
+        downloadButton.disabled = true;
+        const message =
+          e instanceof Error ? e.message : "Invalid input for decoding.";
+        alert(message);
+      }
+    });
+
+    downloadButton.addEventListener("click", () => {
+      if (!lastDecodedBytes || lastDecodedBytes.length === 0) {
+        return;
+      }
+
+      const blob = new Blob([lastDecodedBytes], {
+        type: "application/octet-stream",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "armor64-decoded.bin";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</html>
